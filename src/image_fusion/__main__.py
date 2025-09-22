@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 
-from image_fusion import ImageFuserFactory, FuseMethod, crop_image
+from . import ImageFuserFactory, FuseMethod, crop_image
 from utils import pprint
 from utils.filename_builder import create_out_filename
 

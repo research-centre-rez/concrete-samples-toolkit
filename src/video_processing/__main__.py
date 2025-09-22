@@ -8,8 +8,8 @@ from jsonschema.exceptions import ValidationError
 
 from utils import pprint, load_json_schema, load_config
 from utils.filename_builder import append_file_extension, create_out_filename
-from video_processing import VideoProcessor
-from video_processing import ProcessorMethod
+from . import VideoProcessor
+from . import ProcessorMethod
 
 
 def parse_args():
@@ -43,6 +43,7 @@ def parse_args():
         ),
     )
     req.add_argument(
+        "-m",
         "--method",
         choices=["none", "opt_flow", "approx"],
         required=True,
@@ -55,6 +56,7 @@ def parse_args():
         ),
     )
     optional.add_argument(
+        "-c",
         "--config",
         default="./video_processing/default_config.json5",
         type=str,

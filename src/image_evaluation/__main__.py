@@ -7,12 +7,12 @@ import re
 from collections import defaultdict
 from datetime import datetime
 
-from image_evaluation import (
+from . import (
     NGLV,
     BrennerMethod,
 )
 from tqdm import tqdm
-from image_evaluation.metrics import normType
+from .metrics import normType
 from utils import pprint
 from utils.filename_builder import append_file_extension, create_out_filename
 

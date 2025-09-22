@@ -7,7 +7,7 @@ import logging
 from utils import pprint, load_config, load_json_schema
 from utils.filename_builder import append_file_extension, create_out_filename
 
-from video_registration import RegMethod, VideoRegistrator
+from . import RegMethod, VideoRegistrator
 
 
 def parse_args():
