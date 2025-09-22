@@ -13,8 +13,8 @@ import logging
 import shutil
 
 #from utils import pprint
-from data_preprocessing import detect_black_frames
-from data_preprocessing import split_video
+from . import detect_black_frames
+from . import split_video
 
 from utils import pprint
 
