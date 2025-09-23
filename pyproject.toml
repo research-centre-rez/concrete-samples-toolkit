@@ -1,5 +1,5 @@
 [project]
-name = "crt"
+name = "concrete-registration-toolkit"
 version = "0.1.0"
 description = ""
 authors = [
@@ -9,16 +9,22 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "lightglue @ git+https://github.com/cvg/LightGlue.git",
-    "json5 (>=0.12.1,<0.13.0)",
-    "opencv-python (>=4.12.0.88,<5.0.0.0)",
-    "numpy (>=2.3.3,<3.0.0)",
+    "numpy (>=2.0.0,<3.0.0)",
     "tqdm (>=4.67.1,<5.0.0)",
     "ffmpeg (>=1.4,<2.0)",
+    "json5 (>=0.12.1,<0.13.0)",
     "jsonschema (>=4.25.1,<5.0.0)",
-    "muDIC @ git+https://github.com/PolymerGuy/muDIC.git",
+    "circle-fit (>=0.2.1,<0.3.0)",
+    "matplotlib (>=3.10.6,<4.0.0)",
+    "opencv-python (>=4.12.0.88,<5.0.0.0)",
+    "logging (>=0.4.9.6,<0.5.0.0)",
     "torch (>=2.8.0,<3.0.0)"
 ]
 
+[tool.poetry]
+packages = [
+  { include = "concrete_registration_toolkit", from = "src"}
+]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

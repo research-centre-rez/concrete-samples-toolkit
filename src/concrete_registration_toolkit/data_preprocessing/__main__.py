@@ -16,7 +16,7 @@ import shutil
 from . import detect_black_frames
 from . import split_video
 
-from utils import pprint
+from ..utils import pprint
 
 os.environ["OPENCV_FFMPEG_READ_ATTEMPTS"] = "100000"
 # TODO: Add this to docker

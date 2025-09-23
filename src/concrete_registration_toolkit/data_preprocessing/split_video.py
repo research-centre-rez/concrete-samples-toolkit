@@ -2,7 +2,7 @@ import os
 import subprocess
 import logging
 
-from utils.filename_builder import append_file_extension, create_out_filename
+from ..utils.filename_builder import append_file_extension, create_out_filename
 
 logger = logging.getLogger(__name__)
 
