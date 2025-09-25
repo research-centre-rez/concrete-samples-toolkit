@@ -6,8 +6,8 @@ import logging
 import jsonschema
 from jsonschema.exceptions import ValidationError
 
-from utils import pprint, load_json_schema, load_config
-from utils.filename_builder import append_file_extension, create_out_filename
+from ..utils import pprint, load_json_schema, load_config
+from ..utils.filename_builder import append_file_extension, create_out_filename
 from . import VideoProcessor
 from . import ProcessorMethod
 

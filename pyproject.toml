@@ -1,12 +1,12 @@
 [project]
 name = "concrete-registration-toolkit"
 version = "0.1.0"
-description = ""
+description = "A registration toolkit developed for ÚJV Řež a.s."
 authors = [
     {name = "Erik Leclercq",email = "rkleclercq@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11, <3.14"
 dependencies = [
     "lightglue @ git+https://github.com/cvg/LightGlue.git",
     "numpy (>=2.0.0,<3.0.0)",
@@ -18,7 +18,10 @@ dependencies = [
     "matplotlib (>=3.10.6,<4.0.0)",
     "opencv-python (>=4.12.0.88,<5.0.0.0)",
     "logging (>=0.4.9.6,<0.5.0.0)",
-    "torch (>=2.8.0,<3.0.0)"
+    "torch (>=2.8.0,<3.0.0)",
+    "pytest (>=8.4.2,<9.0.0)",
+    "noise (>=1.2.2,<2.0.0)",
+    "mudic @ git+https://github.com/eriqleclercq/muDIC.git"
 ]
 
 [tool.poetry]
@@ -29,3 +32,8 @@ packages = [
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "src"
+]

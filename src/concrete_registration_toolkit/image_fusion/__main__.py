@@ -4,8 +4,8 @@ import os
 import sys
 
 from . import ImageFuserFactory, FuseMethod, crop_image
-from utils import pprint
-from utils.filename_builder import create_out_filename
+from ..utils import pprint
+from ..utils.filename_builder import create_out_filename
 
 
 def parse_args():

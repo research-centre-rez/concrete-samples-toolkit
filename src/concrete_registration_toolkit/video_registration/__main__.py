@@ -4,8 +4,10 @@ import jsonschema
 import argparse
 import logging
 
-from utils import pprint, load_config, load_json_schema
-from utils.filename_builder import append_file_extension, create_out_filename
+from pathlib import Path
+
+from ..utils import pprint, load_config, load_json_schema
+from ..utils.filename_builder import append_file_extension, create_out_filename
 
 from . import RegMethod, VideoRegistrator
 
@@ -87,7 +89,7 @@ def main(args):
     pprint.log_argparse(args)
 
     CONFIG_SCHEMA = load_json_schema(
-        "./video_registration/video_registration_schema.json"
+        Path(__file__).resolve().parent / "video_registration_schema.json"
     )
     try:
         config = load_config(args.config)

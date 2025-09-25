@@ -6,11 +6,12 @@ import cv2 as cv
 import numpy as np
 from tqdm import tqdm
 
-from utils.filename_builder import append_file_extension, create_out_filename
-from utils.pprint import pprint_dict
-from utils.prep_cap import prep_cap
-import utils.visualisers
-from video_processing.optical_flow import (
+from ..utils.filename_builder import append_file_extension, create_out_filename
+from ..utils.pprint import pprint_dict
+from ..utils.prep_cap import prep_cap
+from ..utils import visualisers
+
+from .optical_flow import (
     analyse_sparse_optical_flow,
     calculate_angular_movement,
     estimate_rotation_center_for_each_trajectory,
@@ -186,7 +187,7 @@ class VideoProcessor:
             "show": False,
         }
         logger.info("Saving rotation analysis graph")
-        utils.visualisers.visualize_rotation_analysis(
+        visualisers.visualize_rotation_analysis(
             np_trajectories, rotation_res, graph_config=graph_config
         )
         angles = rotation_res["median_angle_per_frame_deg"]
