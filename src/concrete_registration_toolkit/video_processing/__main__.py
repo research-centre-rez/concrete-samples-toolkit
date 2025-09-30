@@ -58,7 +58,7 @@ def parse_args():
     optional.add_argument(
         "-c",
         "--config",
-        default="./video_processing/default_config.json5",
+        default=os.path.join(os.path.dirname(__file__), 'default_config.json5'),
         type=str,
         help="Path to a JSON config file that follows the config schema for video processing. The default config schema can be found in './video_process/default_config.json5'",
     )
@@ -73,7 +73,8 @@ def main(args):
     logger = logging.getLogger(__name__)
     pprint.log_argparse(args)
 
-    CONFIG_SCHEMA = load_json_schema("./video_processing/video_processing_schema.json")
+    FILE_DIRECTORY = os.path.dirname(__file__)
+    CONFIG_SCHEMA = load_json_schema(os.path.join(FILE_DIRECTORY, "video_processing_schema.json"))
     try:
         config = load_config(args.config)
         jsonschema.validate(instance=config, schema=CONFIG_SCHEMA)

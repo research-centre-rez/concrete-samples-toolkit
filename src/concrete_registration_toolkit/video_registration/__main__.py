@@ -59,7 +59,7 @@ def parse_args():
     optional.add_argument(
         "-c",
         "--config",
-        default="./video_registration/default_config.json5",
+        default= os.path.join(os.path.dirname(__file__), 'default_config.json5'),
         type=str,
         help="Path to a JSON5 config file that follows the config schema for video registration.",
     )
@@ -88,8 +88,9 @@ def main(args):
     logger.addHandler(fh)
     pprint.log_argparse(args)
 
+    FILE_DIRECTORY = os.path.dirname(__file__)
     CONFIG_SCHEMA = load_json_schema(
-        Path(__file__).resolve().parent / "video_registration_schema.json"
+        os.path.join(FILE_DIRECTORY, 'video_registration_schema.json')
     )
     try:
         config = load_config(args.config)
