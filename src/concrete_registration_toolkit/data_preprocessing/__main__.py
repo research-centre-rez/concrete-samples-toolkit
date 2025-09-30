@@ -12,11 +12,10 @@ import argparse
 import logging
 import shutil
 
-#from utils import pprint
-from . import detect_black_frames
-from . import split_video
-
 from ..utils import pprint
+
+from .detect_black_frames import detect_black_frames
+from .split_video import split_video
 
 os.environ["OPENCV_FFMPEG_READ_ATTEMPTS"] = "100000"
 # TODO: Add this to docker
