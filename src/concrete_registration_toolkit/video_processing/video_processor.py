@@ -200,7 +200,7 @@ class VideoProcessor:
         """
         cap = prep_cap(video_path, 0)
         total_frames = int(cap.get(cv.CAP_PROP_FRAME_COUNT) - self.start_at_frame)
-        center = (0, 0)
+        center = [0, 0]
         angles = [0 for _ in range(total_frames)]
 
         return center, angles
@@ -215,7 +215,7 @@ class VideoProcessor:
         rotation_center = np.array((rotation_center["x"], rotation_center["y"]))
         rot_per_frame = estimate_params["rotation_per_frame"]
 
-        cap = prep_cap(video_path)
+        cap = prep_cap(video_path, self.start_at_frame)
         frame_count = int(cap.get(cv.CAP_PROP_FRAME_COUNT)) - self.start_at_frame
 
         logger.info("Rotation center: %s", rotation_center)
