@@ -4,9 +4,12 @@ import cv2 as cv
 import pytest
 import jsonschema
 
+from .utils import dummy_video_capture
+
 import concrete_registration_toolkit.video_processing as vp
 from concrete_registration_toolkit.video_processing import __main__
 from concrete_registration_toolkit.utils import load_config, load_json_schema
+
 
 
 @pytest.fixture
@@ -19,34 +22,6 @@ def sample_config():
     config["rough_rotation_estimation"]["rotation_per_frame"] = 10
 
     return config
-
-
-class DummyCapture:
-    def __init__(self):
-        self.frame_idx = 0
-        self.total_frames = 5
-
-    def get(self, prop):
-        if prop == cv.CAP_PROP_FRAME_COUNT:
-            return self.total_frames
-        if prop == cv.CAP_PROP_FRAME_WIDTH:
-            return 640
-        if prop == cv.CAP_PROP_FRAME_HEIGHT:
-            return 480
-
-    def read(self):
-        if self.frame_idx < self.total_frames:
-            self.frame_idx += 1
-            return True, np.zeros((480, 640, 3), dtype=np.uint8)
-        else:
-            return False, np.zeros((480, 640, 3), dtype=np.uint8)
-
-    def release(self):
-        return
-
-@pytest.fixture
-def dummy_video_capture():
-    return DummyCapture()
 
 @pytest.fixture
 def processor_factory(dummy_video_capture, monkeypatch):
@@ -135,6 +110,25 @@ def test_parse_args(monkeypatch):
     assert args.config == "config_path"
     assert args.method == "opt_flow"
 
+@pytest.mark.parametrize(
+    "args_list",
+    [
+        ["prog"],
+        ["prog", "-i", "input_path"],
+        ["prog", "-i", "input_path", "-o", "output_path", "-m", "invalid_method"],
+    ]
+)
+def test_parse_args_invalid(monkeypatch, args_list, capsys):
+    monkeypatch.setattr("sys.argv", args_list)
+
+    with pytest.raises(SystemExit) as e:
+        __main__.parse_args()
+
+    assert e.value.code != 0
+
+    captured = capsys.readouterr()
+    assert "error:" in captured.err
+
 
 def test_verify_config():
     root = os.path.dirname(vp.__file__)
@@ -146,6 +140,13 @@ def test_verify_config():
     assert isinstance(schema, dict)
 
     jsonschema.validate(instance=config, schema=schema)
+
+    invalid_config = {
+        "invalid_key": "invalid_value",
+        "another_invalid_key": 0
+    }
+    with pytest.raises(jsonschema.ValidationError) as e:
+        jsonschema.validate(instance=invalid_config, schema=schema)
 
 
 @pytest.mark.parametrize(
