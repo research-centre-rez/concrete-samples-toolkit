@@ -121,23 +121,16 @@ def test_image_writing(fuse_method, tmp_path):
 
     fuser = factory.get_fuser(fuse_method)
 
-    # Create dummy image
     fused_image = np.full((200, 200, 3), 128, dtype=np.uint8)
 
-    # Expected save path (tmp dir)
     save_as = str(tmp_path / "test_output.jpg")  # wrong extension on purpose
 
-    # Monkeypatch cv.imwrite so we don’t actually write a file if you want
-    # But here, let's actually check file creation
     fuser.save_image_to_disc(fused_image, save_as)
 
-    # Because invalid extension ".jpg" should be converted to ".png"
     expected_file = tmp_path / f"test_output_{fuser.method_name}.png"
     assert expected_file.exists()
 
-    # Check image was saved correctly (shape + pixel values)
     saved_img = cv.imread(str(expected_file))
     assert saved_img is not None
     assert saved_img.shape == fused_image.shape
-    # OpenCV might load as BGR but values should match 128
     assert np.allclose(saved_img, 128, atol=1)
