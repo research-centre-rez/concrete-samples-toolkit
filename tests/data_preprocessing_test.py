@@ -4,7 +4,7 @@ from types import SimpleNamespace
 # Import __main__ module
 from concrete_registration_toolkit.data_preprocessing import __main__ as main_module
 import concrete_registration_toolkit.data_preprocessing.detect_black_frames as dbf
-import concrete_registration_toolkit.data_preprocessing.split_video as sv
+import concrete_registration_toolkit.data_preprocessing.split_video as mut
 
 
 @pytest.fixture
@@ -160,13 +160,13 @@ def test_split_video(monkeypatch, tmp_path):
     def fake_ffmpeg_call(cmd):
         return 0
 
-    monkeypatch.setattr(sv.subprocess, "call", fake_ffmpeg_call)
+    monkeypatch.setattr(mut.subprocess, "call", fake_ffmpeg_call)
 
     video_path = "input-video.mp4"
     frame_idx = [0, 30, 60, 90]
     fps = 30.0
 
-    stats = sv.split_video(video_path, frame_idx, str(tmp_path), fps)
+    stats = mut.split_video(video_path, frame_idx, str(tmp_path), fps)
 
     # Check whether the directory was successfully built
     expected_dir = tmp_path / "input"

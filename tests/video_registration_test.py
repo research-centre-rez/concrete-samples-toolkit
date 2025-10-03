@@ -6,7 +6,7 @@ import cv2 as cv
 import pytest
 import jsonschema
 
-import concrete_registration_toolkit.video_registration as vr
+import concrete_registration_toolkit.video_registration as mut
 from concrete_registration_toolkit.video_registration import __main__
 from concrete_registration_toolkit.utils import load_config, load_json_schema
 
@@ -15,7 +15,7 @@ from .utils import dummy_video_capture, dummy_video_capture_image_proxy
 
 @pytest.fixture
 def sample_config():
-    root = os.path.dirname(vr.__file__)
+    root = os.path.dirname(mut.__file__)
     config = load_config(os.path.join(root, "default_config.json5"))
     config["mudic"]["mesh_parameters"] = {
         "box_h": 5,
@@ -38,33 +38,33 @@ def registrator_factory(dummy_video_capture_image_proxy, monkeypatch):
             stack.append(cv.cvtColor(image, cv.COLOR_BGR2GRAY))
         return np.array(stack)
 
-    def _factory(method: vr.RegMethod, config):
+    def _factory(method: mut.RegMethod, config):
         monkeypatch.setattr(
-            vr.registrator,
+            mut.registrator,
             "prep_cap",
             lambda path, set_to: dummy_video_capture_image_proxy,
         )
         monkeypatch.setattr(
-            vr.registrator, "create_video_matrix", dummy_create_video_matrix
+            mut.registrator, "create_video_matrix", dummy_create_video_matrix
         )
-        return vr.VideoRegistrator(method, config)
+        return mut.VideoRegistrator(method, config)
 
     return _factory
 
 
 @pytest.fixture
 def mudic_registrator(sample_config, registrator_factory):
-    return registrator_factory(vr.RegMethod.MUDIC, sample_config)
+    return registrator_factory(mut.RegMethod.MUDIC, sample_config)
 
 
 @pytest.fixture
 def orb_registrator(sample_config, registrator_factory):
-    return registrator_factory(vr.RegMethod.ORB, sample_config)
+    return registrator_factory(mut.RegMethod.ORB, sample_config)
 
 
 @pytest.fixture
 def lightglue_registrator(sample_config, registrator_factory):
-    return registrator_factory(vr.RegMethod.LIGHTGLUE, sample_config)
+    return registrator_factory(mut.RegMethod.LIGHTGLUE, sample_config)
 
 
 @pytest.mark.parametrize(
@@ -119,7 +119,7 @@ def test_parse_args_invalid(monkeypatch, args_list, capsys):
 
 
 def test_verify_config():
-    root = os.path.dirname(vr.__file__)
+    root = os.path.dirname(mut.__file__)
     config = load_config(os.path.join(root, "default_config.json5"))
     schema = load_json_schema(os.path.join(root, "video_registration_schema.json"))
 
@@ -136,13 +136,13 @@ def test_verify_config():
 @pytest.mark.parametrize(
     "method, expected_method",
     [
-        (vr.RegMethod.MUDIC, "_get_mudic_registration"),
-        (vr.RegMethod.ORB, "_get_orb_registration"),
-        (vr.RegMethod.LIGHTGLUE, "_get_lightglue_registration"),
+        (mut.RegMethod.MUDIC, "_get_mudic_registration"),
+        (mut.RegMethod.ORB, "_get_orb_registration"),
+        (mut.RegMethod.LIGHTGLUE, "_get_lightglue_registration"),
     ],
 )
 def test_class_instance(method, expected_method, sample_config):
-    registrator = vr.VideoRegistrator(method=method, config=sample_config)
+    registrator = mut.VideoRegistrator(method=method, config=sample_config)
     assert registrator.method == getattr(registrator, expected_method)
 
 
@@ -200,7 +200,7 @@ def test_write_out_npy_matrix(registrator_fixture, request, monkeypatch, tmp_pat
     monkeypatch.setattr(
         registrator, "_write_transformation_into_csv", dummy_write_trans_into_csv
     )
-    monkeypatch.setattr(vr.registrator.np, "save", dummy_np_save)
+    monkeypatch.setattr(mut.registrator.np, "save", dummy_np_save)
 
     results = registrator.get_registered_block("dummy_path")
 
