@@ -79,7 +79,8 @@ def _split_video(vid_path:str, out_path:str) -> None:
         # videos could already be there. We don't want to remove those
 
 
-def main(args):
+def main():
+    args = parse_args()
     logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(name)s: %(message)s')
     pprint.log_argparse(args)
 
@@ -93,5 +94,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    main(args)
+    main()

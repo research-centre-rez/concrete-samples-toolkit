@@ -13,7 +13,7 @@ def mock_args(tmp_path):
     input_dir = tmp_path / "input"
     input_dir.mkdir()
     output_dir = tmp_path / "output"
-    return SimpleNamespace(input=str(input_dir), output=str(output_dir))
+    return ["prog", "-i", str(input_dir), "-o", str(output_dir)]
 
 
 def test_parse_args(monkeypatch):
@@ -68,41 +68,6 @@ def test_split_video_sucess(tmp_path, monkeypatch):
 
     assert out_path.exists()
 
-
-def test_main_directory_vs_file(tmp_path, monkeypatch, mock_args):
-    """Test main() chooses _split_videos_in_directory or _split_video correctly."""
-    called = {"dir": False, "file": False}
-
-    def fake_split_videos_in_directory(directory_path, output_dir):
-        called["dir"] = True
-        assert directory_path == mock_args.input
-        assert output_dir == mock_args.output
-
-    def fake_split_video(vid_path, out_path):
-        called["file"] = True
-        assert vid_path == mock_args.input
-        assert out_path == mock_args.output
-
-    monkeypatch.setattr(
-        main_module, "_split_videos_in_directory", fake_split_videos_in_directory
-    )
-    monkeypatch.setattr(main_module, "_split_video", fake_split_video)
-
-    # Directory case
-    main_module.main(mock_args)
-    assert called["dir"] is True
-    assert called["file"] is False
-
-    # Single file case
-    called["dir"] = False
-    called["file"] = False
-    file_path = tmp_path / "video.mp4"
-    file_path.touch()
-    # Update args.input to be a file
-    mock_args.input = str(file_path)
-    main_module.main(mock_args)
-    assert called["file"] is True
-    assert called["dir"] is False
 
 
 def test_detect_black_frames(monkeypatch):

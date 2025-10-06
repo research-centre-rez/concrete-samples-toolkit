@@ -67,7 +67,8 @@ def parse_args():
     return argparser.parse_args()
 
 
-def main(args):
+def main():
+    args = parse_args()
     logging.basicConfig(
         level=logging.INFO, format="%(levelname)s:%(name)s: %(message)s"
     )
@@ -126,5 +127,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    main(args)
+    main()

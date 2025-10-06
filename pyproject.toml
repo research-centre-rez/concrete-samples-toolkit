@@ -6,7 +6,7 @@ authors = [
     {name = "Erik Leclercq",email = "rkleclercq@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.11, <3.14"
+requires-python = ">=3.10, <3.14"
 dependencies = [
     "lightglue @ git+https://github.com/cvg/LightGlue.git",
     "numpy (>=2.0.0,<3.0.0)",
@@ -17,7 +17,6 @@ dependencies = [
     "circle-fit (>=0.2.1,<0.3.0)",
     "matplotlib (>=3.10.6,<4.0.0)",
     "opencv-python (>=4.12.0.88,<5.0.0.0)",
-    "logging (>=0.4.9.6,<0.5.0.0)",
     "torch (>=2.8.0,<3.0.0)",
     "pytest (>=8.4.2,<9.0.0)",
     "noise (>=1.2.2,<2.0.0)",
@@ -37,3 +36,9 @@ build-backend = "poetry.core.masonry.api"
 pythonpath = [
   "src"
 ]
+
+[project.scripts]
+crt-pre-processing = "concrete_registration_toolkit.data_preprocessing.__main__:main"
+crt-video-processing = "concrete_registration_toolkit.video_processing.__main__:main"
+crt-video-register = "concrete_registration_toolkit.video_registration.__main__:main"
+crt-image-fusion = "concrete_registration_toolkit.image_fusion.__main__:main"

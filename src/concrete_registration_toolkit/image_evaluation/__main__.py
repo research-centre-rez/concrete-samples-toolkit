@@ -102,7 +102,8 @@ def extract_sample_and_fuse_type(
     return sample_name, fuse_type
 
 
-def main(args):
+def main():
+    args = parse_args()
     logging.basicConfig(
         level=logging.INFO, format="%(levelname)s:%(name)s: %(message)s"
     )
@@ -160,5 +161,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    main(args)
+    main()
