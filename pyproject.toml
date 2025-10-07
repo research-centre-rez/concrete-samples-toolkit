@@ -1,5 +1,5 @@
 [project]
-name = "concrete-registration-toolkit"
+name = "concrete-samples-toolkit"
 version = "0.1.0"
 description = "A registration toolkit developed for ÚJV Řež a.s."
 authors = [
@@ -25,7 +25,7 @@ dependencies = [
 
 [tool.poetry]
 packages = [
-  { include = "concrete_registration_toolkit", from = "src"}
+  { include = "concrete_samples_toolkit", from = "src"}
 ]
 
 [build-system]
@@ -38,7 +38,7 @@ pythonpath = [
 ]
 
 [project.scripts]
-crt-pre-processing = "concrete_registration_toolkit.data_preprocessing.__main__:main"
-crt-video-processing = "concrete_registration_toolkit.video_processing.__main__:main"
-crt-video-register = "concrete_registration_toolkit.video_registration.__main__:main"
-crt-image-fusion = "concrete_registration_toolkit.image_fusion.__main__:main"
+cst-pre-processing = "concrete_samples_toolkit.data_preprocessing.__main__:main"
+cst-video-processing = "concrete_samples_toolkit.video_processing.__main__:main"
+cst-video-register = "concrete_samples_toolkit.video_registration.__main__:main"
+cst-image-fusion = "concrete_samples_toolkit.image_fusion.__main__:main"
