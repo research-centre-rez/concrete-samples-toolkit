@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 from ..utils.filename_builder import append_file_extension, create_out_filename
 from ..utils.pprint import pprint_dict
-from ..utils.prep_cap import prep_cap
+from ..utils.prepare_opencv_capture import prep_cap
 from ..utils import visualisers
 
 from .optical_flow import (

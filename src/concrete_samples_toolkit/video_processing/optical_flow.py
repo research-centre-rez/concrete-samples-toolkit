@@ -7,7 +7,7 @@ import cv2 as cv
 import numpy as np
 from tqdm import tqdm
 
-from ..utils.prep_cap import prep_cap
+from ..utils.prepare_opencv_capture import prep_cap
 
 
 class Format(Enum):

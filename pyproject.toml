@@ -1,7 +1,7 @@
 [project]
 name = "concrete-samples-toolkit"
 version = "0.1.0"
-description = "A registration toolkit developed for ÚJV Řež a.s."
+description = "A registration toolkit developed for Centrum Výzkumu Řež s.r.o."
 authors = [
     {name = "Erik Leclercq",email = "rkleclercq@gmail.com"}
 ]

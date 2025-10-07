@@ -18,7 +18,7 @@ from skimage.measure import EllipseModel
 from tqdm import tqdm
 from .mudic_utils import extract_medians
 from ..utils.filename_builder import append_file_extension, create_out_filename
-from ..utils.prep_cap import prep_cap
+from ..utils.prepare_opencv_capture import prep_cap
 
 from .mt_homography import compute_and_apply_homography
 from .mudic_utils import correlate_matrix, create_mesh

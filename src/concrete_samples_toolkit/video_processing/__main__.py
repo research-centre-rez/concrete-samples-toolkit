@@ -74,8 +74,8 @@ def main():
     logger = logging.getLogger(__name__)
     pprint.log_argparse(args)
 
-    FILE_DIRECTORY = os.path.dirname(__file__)
-    CONFIG_SCHEMA = load_json_schema(os.path.join(FILE_DIRECTORY, "video_processing_schema.json"))
+    CONFIG_DIRECTORY = os.path.dirname(__file__)
+    CONFIG_SCHEMA = load_json_schema(os.path.join(CONFIG_DIRECTORY, "video_processing_schema.json"))
     try:
         config = load_config(args.config)
         jsonschema.validate(instance=config, schema=CONFIG_SCHEMA)
