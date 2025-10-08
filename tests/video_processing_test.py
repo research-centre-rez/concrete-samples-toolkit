@@ -6,9 +6,9 @@ import jsonschema
 
 from .utils import dummy_video_capture
 
-import concrete_registration_toolkit.video_processing as mut
-from concrete_registration_toolkit.video_processing import __main__
-from concrete_registration_toolkit.utils import load_config, load_json_schema
+import concrete_samples_toolkit.video_processing as mut
+from concrete_samples_toolkit.video_processing import __main__
+from concrete_samples_toolkit.utils import load_config, load_json_schema
 
 
 

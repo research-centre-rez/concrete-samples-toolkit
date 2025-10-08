@@ -1,6 +1,8 @@
 import pytest
-from concrete_registration_toolkit.image_evaluation import __main__
-import concrete_registration_toolkit.image_evaluation as mut
+from concrete_samples_toolkit.image_evaluation import __main__
+import concrete_samples_toolkit.image_evaluation as mut
+
+import numpy as np
 
 
 @pytest.mark.parametrize(
@@ -47,10 +49,6 @@ def test_parse_args_invalid(monkeypatch, args_list, capsys):
     assert "error:" in captured.err
 
 
-import pytest
-import numpy as np
-import cv2 as cv
-import concrete_registration_toolkit.image_evaluation as mut
 
 
 @pytest.fixture

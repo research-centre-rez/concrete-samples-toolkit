@@ -2,9 +2,9 @@ import pytest
 from types import SimpleNamespace
 
 # Import __main__ module
-from concrete_registration_toolkit.data_preprocessing import __main__ as main_module
-import concrete_registration_toolkit.data_preprocessing.detect_black_frames as dbf
-import concrete_registration_toolkit.data_preprocessing.split_video as mut
+from concrete_samples_toolkit.data_preprocessing import __main__ as main_module
+import concrete_samples_toolkit.data_preprocessing.detect_black_frames as dbf
+import concrete_samples_toolkit.data_preprocessing.split_video as mut
 
 
 @pytest.fixture

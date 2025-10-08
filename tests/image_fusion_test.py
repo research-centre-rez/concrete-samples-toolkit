@@ -1,8 +1,8 @@
 import pytest
 import cv2 as cv
 import numpy as np
-from concrete_registration_toolkit.image_fusion import __main__
-import concrete_registration_toolkit.image_fusion as mut
+from concrete_samples_toolkit.image_fusion import __main__
+import concrete_samples_toolkit.image_fusion as mut
 from .utils import dummy_video_capture_image_proxy
 
 

@@ -6,9 +6,9 @@ import cv2 as cv
 import pytest
 import jsonschema
 
-import concrete_registration_toolkit.video_registration as mut
-from concrete_registration_toolkit.video_registration import __main__
-from concrete_registration_toolkit.utils import load_config, load_json_schema
+import concrete_samples_toolkit.video_registration as mut
+from concrete_samples_toolkit.video_registration import __main__
+from concrete_samples_toolkit.utils import load_config, load_json_schema
 
 from .utils import dummy_video_capture, dummy_video_capture_image_proxy
 
