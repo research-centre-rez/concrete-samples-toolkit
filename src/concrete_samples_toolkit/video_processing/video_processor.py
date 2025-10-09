@@ -6,11 +6,12 @@ import cv2 as cv
 import numpy as np
 from tqdm import tqdm
 
-from utils.filename_builder import append_file_extension, create_out_filename
-from utils.pprint import pprint_dict
-from utils.prep_cap import prep_cap
-import utils.visualisers
-from video_processing.optical_flow import (
+from ..utils.filename_builder import append_file_extension, create_out_filename
+from ..utils.pprint import pprint_dict
+from ..utils.prepare_opencv_capture import prep_cap
+from ..utils import visualisers
+
+from .optical_flow import (
     analyse_sparse_optical_flow,
     calculate_angular_movement,
     estimate_rotation_center_for_each_trajectory,
@@ -186,7 +187,7 @@ class VideoProcessor:
             "show": False,
         }
         logger.info("Saving rotation analysis graph")
-        utils.visualisers.visualize_rotation_analysis(
+        visualisers.visualize_rotation_analysis(
             np_trajectories, rotation_res, graph_config=graph_config
         )
         angles = rotation_res["median_angle_per_frame_deg"]
@@ -199,7 +200,7 @@ class VideoProcessor:
         """
         cap = prep_cap(video_path, 0)
         total_frames = int(cap.get(cv.CAP_PROP_FRAME_COUNT) - self.start_at_frame)
-        center = (0, 0)
+        center = [0, 0]
         angles = [0 for _ in range(total_frames)]
 
         return center, angles
@@ -214,7 +215,7 @@ class VideoProcessor:
         rotation_center = np.array((rotation_center["x"], rotation_center["y"]))
         rot_per_frame = estimate_params["rotation_per_frame"]
 
-        cap = prep_cap(video_path)
+        cap = prep_cap(video_path, self.start_at_frame)
         frame_count = int(cap.get(cv.CAP_PROP_FRAME_COUNT)) - self.start_at_frame
 
         logger.info("Rotation center: %s", rotation_center)

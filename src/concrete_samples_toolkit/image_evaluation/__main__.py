@@ -7,14 +7,14 @@ import re
 from collections import defaultdict
 from datetime import datetime
 
-from image_evaluation import (
+from . import (
     NGLV,
     BrennerMethod,
 )
 from tqdm import tqdm
-from image_evaluation.metrics import normType
-from utils import pprint
-from utils.filename_builder import append_file_extension, create_out_filename
+from .metrics import normType
+from ..utils import pprint
+from ..utils.filename_builder import append_file_extension, create_out_filename
 
 
 logger = logging.getLogger(__name__)
@@ -102,7 +102,8 @@ def extract_sample_and_fuse_type(
     return sample_name, fuse_type
 
 
-def main(args):
+def main():
+    args = parse_args()
     logging.basicConfig(
         level=logging.INFO, format="%(levelname)s:%(name)s: %(message)s"
     )
@@ -160,5 +161,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    main(args)
+    main()

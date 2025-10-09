@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import cv2 as cv
 import numpy as np
 
-from utils.filename_builder import append_file_extension, create_out_filename
+from .filename_builder import append_file_extension, create_out_filename
 
 # Leclercq's util functions
 

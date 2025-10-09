@@ -6,10 +6,10 @@ import logging
 import jsonschema
 from jsonschema.exceptions import ValidationError
 
-from utils import pprint, load_json_schema, load_config
-from utils.filename_builder import append_file_extension, create_out_filename
-from video_processing import VideoProcessor
-from video_processing import ProcessorMethod
+from ..utils import pprint, load_json_schema, load_config
+from ..utils.filename_builder import append_file_extension, create_out_filename
+from . import VideoProcessor
+from . import ProcessorMethod
 
 
 def parse_args():
@@ -43,6 +43,7 @@ def parse_args():
         ),
     )
     req.add_argument(
+        "-m",
         "--method",
         choices=["none", "opt_flow", "approx"],
         required=True,
@@ -55,8 +56,9 @@ def parse_args():
         ),
     )
     optional.add_argument(
+        "-c",
         "--config",
-        default="./video_processing/default_config.json5",
+        default=os.path.join(os.path.dirname(__file__), 'default_config.json5'),
         type=str,
         help="Path to a JSON config file that follows the config schema for video processing. The default config schema can be found in './video_process/default_config.json5'",
     )
@@ -64,14 +66,16 @@ def parse_args():
     return argparser.parse_args()
 
 
-def main(args):
+def main():
+    args = parse_args()
     logging.basicConfig(
         level=logging.INFO, format="%(levelname)s:%(name)s: %(message)s"
     )
     logger = logging.getLogger(__name__)
     pprint.log_argparse(args)
 
-    CONFIG_SCHEMA = load_json_schema("./video_processing/video_processing_schema.json")
+    CONFIG_DIRECTORY = os.path.dirname(__file__)
+    CONFIG_SCHEMA = load_json_schema(os.path.join(CONFIG_DIRECTORY, "video_processing_schema.json"))
     try:
         config = load_config(args.config)
         jsonschema.validate(instance=config, schema=CONFIG_SCHEMA)
@@ -98,5 +102,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    main(args)
+    main()

@@ -12,11 +12,10 @@ import argparse
 import logging
 import shutil
 
-#from utils import pprint
-from data_preprocessing import detect_black_frames
-from data_preprocessing import split_video
+from ..utils import pprint
 
-from utils import pprint
+from .detect_black_frames import detect_black_frames
+from .split_video import split_video
 
 os.environ["OPENCV_FFMPEG_READ_ATTEMPTS"] = "100000"
 # TODO: Add this to docker
@@ -80,7 +79,8 @@ def _split_video(vid_path:str, out_path:str) -> None:
         # videos could already be there. We don't want to remove those
 
 
-def main(args):
+def main():
+    args = parse_args()
     logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(name)s: %(message)s')
     pprint.log_argparse(args)
 
@@ -94,5 +94,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    main(args)
+    main()

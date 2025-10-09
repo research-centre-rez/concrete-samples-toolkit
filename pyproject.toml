@@ -1,0 +1,44 @@
+[project]
+name = "concrete-samples-toolkit"
+version = "0.1.0"
+description = "A registration toolkit developed for Centrum Výzkumu Řež s.r.o."
+authors = [
+    {name = "Erik Leclercq",email = "rkleclercq@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.10, <3.14"
+dependencies = [
+    "lightglue @ git+https://github.com/cvg/LightGlue.git",
+    "numpy (>=2.0.0,<3.0.0)",
+    "tqdm (>=4.67.1,<5.0.0)",
+    "ffmpeg (>=1.4,<2.0)",
+    "json5 (>=0.12.1,<0.13.0)",
+    "jsonschema (>=4.25.1,<5.0.0)",
+    "circle-fit (>=0.2.1,<0.3.0)",
+    "matplotlib (>=3.10.6,<4.0.0)",
+    "opencv-python (>=4.12.0.88,<5.0.0.0)",
+    "torch (>=2.8.0,<3.0.0)",
+    "pytest (>=8.4.2,<9.0.0)",
+    "noise (>=1.2.2,<2.0.0)",
+    "mudic @ git+https://github.com/eriqleclercq/muDIC.git"
+]
+
+[tool.poetry]
+packages = [
+  { include = "concrete_samples_toolkit", from = "src"}
+]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "src"
+]
+
+[project.scripts]
+cst-pre-processing = "concrete_samples_toolkit.data_preprocessing.__main__:main"
+cst-video-processing = "concrete_samples_toolkit.video_processing.__main__:main"
+cst-video-register = "concrete_samples_toolkit.video_registration.__main__:main"
+cst-image-fusion = "concrete_samples_toolkit.image_fusion.__main__:main"

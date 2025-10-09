@@ -17,12 +17,12 @@ import torch.nn.functional as F
 from skimage.measure import EllipseModel
 from tqdm import tqdm
 from .mudic_utils import extract_medians
-from utils.filename_builder import append_file_extension, create_out_filename
-from utils.prep_cap import prep_cap
+from ..utils.filename_builder import append_file_extension, create_out_filename
+from ..utils.prepare_opencv_capture import prep_cap
 
-from video_registration.mt_homography import compute_and_apply_homography
-from video_registration.mudic_utils import correlate_matrix, create_mesh
-from video_registration.video_matrix import create_video_matrix
+from .mt_homography import compute_and_apply_homography
+from .mudic_utils import correlate_matrix, create_mesh
+from .video_matrix import create_video_matrix
 
 logger = logging.getLogger(__name__)
 
@@ -330,7 +330,7 @@ class VideoRegistrator:
         x_c, y_c = self._fit_ellipse(displacement)
         transformations = [np.eye(3, 3)]
 
-        for i in tqdm(range(n), desc="Registering by shift"):
+        for i in tqdm(range(1, n), desc="Registering by shift"):
             image = image_stack[i]
             x_d, y_d = displacement[i]
 

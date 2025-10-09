@@ -3,9 +3,9 @@ import logging
 import os
 import sys
 
-from image_fusion import ImageFuserFactory, FuseMethod, crop_image
-from utils import pprint
-from utils.filename_builder import create_out_filename
+from . import ImageFuserFactory, FuseMethod, crop_image
+from ..utils import pprint
+from ..utils.filename_builder import create_out_filename
 
 
 def parse_args():
@@ -66,7 +66,8 @@ def parse_args():
     return argparser.parse_args()
 
 
-def main(args):
+def main():
+    args = parse_args()
     logging.basicConfig(
         level=logging.INFO, format="%(levelname)s:%(name)s: %(message)s"
     )
@@ -127,5 +128,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    main(args)
+    main()

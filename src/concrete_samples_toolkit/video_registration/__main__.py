@@ -4,10 +4,10 @@ import jsonschema
 import argparse
 import logging
 
-from utils import pprint, load_config, load_json_schema
-from utils.filename_builder import append_file_extension, create_out_filename
+from ..utils import pprint, load_config, load_json_schema
+from ..utils.filename_builder import create_out_filename
 
-from video_registration import RegMethod, VideoRegistrator
+from . import RegMethod, VideoRegistrator
 
 
 def parse_args():
@@ -57,7 +57,7 @@ def parse_args():
     optional.add_argument(
         "-c",
         "--config",
-        default="./video_registration/default_config.json5",
+        default= os.path.join(os.path.dirname(__file__), 'default_config.json5'),
         type=str,
         help="Path to a JSON5 config file that follows the config schema for video registration.",
     )
@@ -65,7 +65,8 @@ def parse_args():
     return argparser.parse_args()
 
 
-def main(args):
+def main():
+    args = parse_args()
     logging.basicConfig(
         level=logging.INFO, format="%(levelname)s:%(name)s: %(message)s"
     )
@@ -86,8 +87,9 @@ def main(args):
     logger.addHandler(fh)
     pprint.log_argparse(args)
 
+    CONFIG_DIRECTORY = os.path.dirname(__file__)
     CONFIG_SCHEMA = load_json_schema(
-        "./video_registration/video_registration_schema.json"
+        os.path.join(CONFIG_DIRECTORY, 'video_registration_schema.json')
     )
     try:
         config = load_config(args.config)
@@ -123,5 +125,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    main(args)
+    main()
