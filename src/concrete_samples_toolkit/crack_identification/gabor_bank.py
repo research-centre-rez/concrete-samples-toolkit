@@ -6,17 +6,16 @@ import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 from dataclasses import dataclass
-from skimage.filters.rank import median
-from skimage.morphology import disk, binary_erosion, closing, label
 import torch.nn.functional as F
 import torch
-import sys
-
-from local_contrast_normalisation import local_contrast_normalisation
 
 
 @dataclass
 class GaborKernel:
+    """
+    Dataclass for creating gabor filters
+    """
+
     kernel_shape: Union[tuple[int, int], int]
     sigma: float
     theta: float
@@ -24,7 +23,7 @@ class GaborKernel:
     gamma: float
     psi: float
     kernel_type: int
-    gabor_kernel: np.ndarray = None
+    gabor_kernel: np.ndarray = None  # This will get created after __init__
 
     def __post_init__(self):
         if isinstance(self.kernel_shape, int) or isinstance(self.kernel_shape, float):
@@ -57,14 +56,20 @@ class GaborKernel:
 
 
 class GaborKernelBank:
+    """
+    Class used for applying a bank of Gabor filters onto an image and extracting its features. There are three main ways of processing an image with this gabor bank:
+        `apply_bank_on_image`: Processes a single image with the bank of filters. This is done solely on the CPU and works only on a single image.
+        `apply_bank_on_image_gpu`: Processes a single image with the bank of filters with the use of GPU. The kernels are stacked into a single matrix (and also padded if needed), and then applied on the image in parallel with the use of a GPU. If this is called and no GPU is available, PyTorch will intead do this operation on the CPU.
+        `apply_bank_on_images_gpu`: Processes a batch of images with the bank of filters the GPU. The kernels are stacked into a single matrix (and padded if needed), and then applied on the image in parallel with the use of a GPU. If this is called and no GPU is available, PyTorch will intead do this operation on the CPU.
+    """
+
     def __init__(self) -> None:
-        self.kernels = []
-        # self.gpu_kernels = []
-        self.padded_gpu_kernels = None
+        self.kernels = []  # a list of GaborKernels
+        self.padded_gpu_kernels = None  # gabor kernel matrices that are on the GPU
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
     def add_gabor_kernel(self, k_params: GaborKernel) -> None:
         self.kernels.append(k_params)
-        # self.gpu_kernels.append(torch.from_numpy(k_params.gabor_kernel).to("cuda"))
 
     def add_random_gabor_kernel(self, add_n_kernels) -> None:
         for _ in range(add_n_kernels):
@@ -90,7 +95,10 @@ class GaborKernelBank:
             self.kernels.append(params)
             # self.gpu_kernels.append(torch.from_numpy(params.gabor_kernel).to("cuda"))
 
-    def pad_gpu_kernels(self):
+    def pad_gpu_kernels(self) -> None:
+        '''
+        The gabor kernels need to be padded in order for us to be able to do the convolution in batches. Thus they are padded with 0s and added to `self.padded_gpu_kernels`.
+        '''
         self.padded_gpu_kernels = []
         max_length = max(k.gabor_kernel.shape[0] for k in self.kernels)
         for kernel in self.kernels:
@@ -101,10 +109,10 @@ class GaborKernelBank:
                     (padding_required, padding_required),
                     mode="constant",
                 )
-                self.padded_gpu_kernels.append(torch.from_numpy(padded).to("cuda"))
+                self.padded_gpu_kernels.append(torch.from_numpy(padded).to(self.device))
             else:
                 self.padded_gpu_kernels.append(
-                    torch.from_numpy(kernel.gabor_kernel).to("cuda")
+                    torch.from_numpy(kernel.gabor_kernel).to(self.device)
                 )
 
     def apply_bank_on_image(
@@ -118,14 +126,12 @@ class GaborKernelBank:
         if len(src_image.shape) == 3:
             gray = cv.cvtColor(src_image, cv.COLOR_BGR2GRAY)
         else:
-            gray = src_image.copy()
+            gray = src_image
 
         filtered_images = []
 
         for kernel in self.kernels:
             filtered = cv.filter2D(gray, cv.CV_32F, kernel.gabor_kernel)
-            # filtered_norm = local_contrast_normalisation(filtered)
-            # filtered_norm = np.nan_to_num(filtered_norm, nan=0.0, posinf=0.0, neginf=0.0)
 
             filtered_images.append(filtered.astype(np.uint8))
 
@@ -147,9 +153,9 @@ class GaborKernelBank:
                 tensor_image = cv.cvtColor(src_image, cv.COLOR_BGR2GRAY)
             else:
                 tensor_image = src_image
-            tensor_image = torch.from_numpy(tensor_image).float().to("cuda")
+            tensor_image = torch.from_numpy(tensor_image).float().to(self.device)
         else:
-            tensor_image = src_image.float().to("cuda")
+            tensor_image = src_image.float().to(self.device)
 
         # Need to create a fake batch for PyTorch
         if tensor_image.ndim == 2:
@@ -163,19 +169,21 @@ class GaborKernelBank:
             weights = torch.stack(
                 [k[None, ...] for k in self.padded_gpu_kernels], dim=0
             )
-            filtered_image = F.conv2d(tensor_image, weights, padding="same").max(dim=1).values
+            filtered_image = (
+                F.conv2d(tensor_image, weights, padding="same").max(dim=1).values
+            )
             return filtered_image.squeeze(0).detach().cpu().numpy()
 
-#            if combine:
-#                return filtered_image.max(dim=1).values
-#
-#            individual_kernel_images = filtered_image.squeeze(0).detach().cpu().numpy()
-#
-#            if combine:
-#                combined = individual_kernel_images.max(axis=0)
-#                return combined
-#
-#            return [img.astype(np.uint8) for img in individual_kernel_images]
+    #            if combine:
+    #                return filtered_image.max(dim=1).values
+    #
+    #            individual_kernel_images = filtered_image.squeeze(0).detach().cpu().numpy()
+    #
+    #            if combine:
+    #                combined = individual_kernel_images.max(axis=0)
+    #                return combined
+    #
+    #            return [img.astype(np.uint8) for img in individual_kernel_images]
 
     def apply_bank_on_images_gpu(
         self, src_images: list[torch.Tensor], combine: bool = False
@@ -189,11 +197,8 @@ class GaborKernelBank:
             imgs = []
             for img in src_images:
                 imgs.append(img.float())
-                print(
-                    f"Image size: {img.float().untyped_storage().nbytes() / 1_000_000} MB"
-                )
 
-            gray = torch.stack(imgs, dim=0).unsqueeze(1).to("cuda")
+            gray = torch.stack(imgs, dim=0).unsqueeze(1).to(self.device)
 
             if self.padded_gpu_kernels is None:
                 self.pad_gpu_kernels()
@@ -204,16 +209,16 @@ class GaborKernelBank:
 
             filtered = F.conv2d(gray, weights, padding="same")
 
-            print(f"Dataset occupies {gray.untyped_storage().nbytes() / 1_000_000} MB")
-            print(f"Weights occupy {weights.untyped_storage().nbytes() / 1_000_000} MB")
-            print(
-                f"After pass through the convolution: {filtered.untyped_storage().nbytes() / 1_000_000} MB"
-            )
+            #            print(f"Dataset occupies {gray.untyped_storage().nbytes() / 1_000_000} MB")
+            #            print(f"Weights occupy {weights.untyped_storage().nbytes() / 1_000_000} MB")
+            #            print(
+            #                f"After pass through the convolution: {filtered.untyped_storage().nbytes() / 1_000_000} MB"
+            #            )
 
             filtered_np = filtered.detach().cpu().numpy()
 
             if combine:
-                combined = filtered_np.max(axis=0)
+                combined = filtered_np.max(axis=1)
                 return [img.astype(np.uint8) for img in combined]
 
             results = []
@@ -227,9 +232,15 @@ class GaborKernelBank:
             return results
 
     def get_gabor_kernel(self, index) -> GaborKernel:
+        """
+        Returns a gabor kernel from the specific index.
+        """
         return self.kernels[index]
 
     def write_out_kernels(self) -> None:
+        """
+        Writes out each of the gabor kernels into the terminal.
+        """
         for index, kernel in enumerate(self.kernels):
             print(f"Kernel index: {index}")
             print(f"\t {kernel}")
