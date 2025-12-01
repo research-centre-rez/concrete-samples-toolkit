@@ -101,7 +101,7 @@ def create_csv_pairs(
             video_id = extract_video_id(path)
             grouped_after[video_id % 2].append(path)
 
-        for parity in (0,1):
+        for parity in (0, 1):
             before_group = grouped_before[parity]
             after_group = grouped_after[parity]
 
@@ -109,19 +109,19 @@ def create_csv_pairs(
             for i in range(count):
                 pairs.append((before_group[i], after_group[i]))
 
-
     return pairs
 
-def write_out_csv_file(root_directory:str, pairs_to_write:list[tuple[str]]) -> None:
 
-    filename = 'before_after_pairs.csv'
+def write_out_csv_file(root_directory: str, pairs_to_write: list[tuple[str]]) -> None:
+
+    filename = "before_after_pairs.csv"
     out_file = os.path.join(root_directory, filename)
     print(out_file)
 
-    with open(out_file, 'w+', newline='') as f:
+    with open(out_file, "w+", newline="") as f:
         writer = csv.writer(f)
 
-        writer.writerow(['Sample before exposure', 'Sample after exposure'])
+        writer.writerow(["Sample before exposure", "Sample after exposure"])
         writer.writerows(pairs_to_write)
 
 
