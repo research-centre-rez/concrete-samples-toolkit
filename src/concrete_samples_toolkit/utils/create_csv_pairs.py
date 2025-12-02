@@ -51,7 +51,7 @@ def find_npy_files(exp_subdir, base_dir):
 
 def collect_paths(base_dir):
 
-    subdir_names = sorted(os.listdir(base_dir))
+    subdir_names = sorted(next(os.walk(base_dir))[1])
     assert len(subdir_names) == 2, "There should only be 2 subdirectories in the root"
 
     after_exposure_directory = subdir_names[0]
