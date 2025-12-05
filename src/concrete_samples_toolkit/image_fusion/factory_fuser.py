@@ -18,6 +18,7 @@ class FuseMethod(Enum):
     VAR = auto()
     MED = auto()
     MEAN = auto()
+    PERCENTILE = auto()
 
 
 class Fuser:
@@ -137,6 +138,7 @@ class MaxFuser(Fuser):
         scale = stack_mean / (fused_mean + 1e-8)  # avoid division by zero
         return np.clip(fused * scale, 0, 255).astype(verified_stack.dtype)
 
+
 class MeanFuser(Fuser):
     """
     Take the mean value of pixels across the image stack.
@@ -184,6 +186,19 @@ class VarFuser(Fuser):
         )
         return var_img
 
+class PercentileFuser(Fuser):
+    def __init__(self) -> None:
+        super().__init__(FuseMethod.PERCENTILE)
+
+    def get_fused_image(self, video_stack: Union[str, np.ndarray], percentile=50) -> np.ndarray:
+        verified_stack = self._verify_video_stack(video_stack)
+        self._log_activity()
+        percentile_img = np.percentile(a=verified_stack,
+                                       q=percentile,
+                                       axis=0)
+        return percentile_img
+
+
 
 class ImageFuserFactory:
     """
@@ -196,6 +211,7 @@ class ImageFuserFactory:
         FuseMethod.VAR: VarFuser,
         FuseMethod.MED: MedianFuser,
         FuseMethod.MEAN: MeanFuser,
+        FuseMethod.PERCENTILE: PercentileFuser
     }
 
     @classmethod

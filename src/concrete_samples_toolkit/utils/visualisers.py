@@ -25,7 +25,7 @@ def show_overlay(saving_dest:str, img:cv.typing.MatLike, mask:cv.typing.MatLike,
 
     cv.imwrite(saving_dest, overlaid)
 
-def imshow(title= None, **images) -> None:
+def imshow(title=None, save_as=None, **images) -> None:
     '''
     Displays images in one row.
     Args:
@@ -37,7 +37,7 @@ def imshow(title= None, **images) -> None:
 
     n = len(images)
 
-    cols = min(n, 3)
+    cols = min(n, 2)
     rows = int(np.ceil(n / cols))
 
     fig, axes = plt.subplots(rows, cols, figsize=(cols*4, rows*3), constrained_layout=True)
@@ -60,6 +60,7 @@ def imshow(title= None, **images) -> None:
     for ax in axes[len(images):]:
         ax.axis('off')
 
+    fig.suptitle(title)
     plt.show()
     plt.pause(0.1)
 
