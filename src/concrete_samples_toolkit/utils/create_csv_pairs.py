@@ -188,7 +188,7 @@ def write_out_csv_file(root_directory: str, pairs_to_write: list[tuple[str]]) ->
         before_exp/1A1/front/GX013/GX011406_registered.npy,after_exp/1A1/front/GX011/GX011600_registered.npy
         ...
 
-    Args: 
+    Args:
         root_directory (str): This is where the csv will be written
         pairs_to_write (list[tuple[str]]): The pairs that we want to write into the csv
     Returns:

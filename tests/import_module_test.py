@@ -11,6 +11,7 @@ import pytest
         "concrete_samples_toolkit.utils",
         "concrete_samples_toolkit.video_processing",
         "concrete_samples_toolkit.video_registration",
+        "concrete_samples_toolkit.crack_identification"
 
     ],
 )
