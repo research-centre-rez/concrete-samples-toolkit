@@ -29,8 +29,8 @@ def keep_largest_component(mask: np.ndarray) -> np.ndarray:
     """
     labels_mask = label(1 - mask)
 
-    # Mask contains no regions
-    if labels_mask.max() == 0:
+    # Mask contains one or no regions
+    if labels_mask.max() <= 1:
         return mask
 
     regions = measure.regionprops(labels_mask)
