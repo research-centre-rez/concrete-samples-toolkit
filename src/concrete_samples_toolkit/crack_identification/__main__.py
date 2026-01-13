@@ -7,6 +7,7 @@ import json
 
 import numpy as np
 import cv2 as cv
+import pandas as pd
 
 from .sample_mask_extraction import (
     get_fused_image_pairs,
@@ -48,23 +49,6 @@ def parse_args():
     )
 
     return argparser.parse_args()
-
-
-def parse_csv_pairs(csv_file_path: str) -> Generator[list[str], None, None]:
-    """
-    Function responsible for parsing pairs from the input csv.
-
-    Args:
-        csv_file_path (str): Path to the csv, should contain `.csv`
-    Yields:
-        a tuple, where the first element is the path to the registered sample before exposure and the second element is the path to registered sample after exposure.
-    """
-
-    with open(csv_file_path, "r+") as file:
-        csv_reader = csv.reader(file)
-        next(csv_reader)  # Skipping the header row
-
-        yield from csv_reader
 
 
 def overlay_mask(
@@ -109,7 +93,9 @@ def create_out_filenames(path: str) -> tuple[str, str]:
     """
 
     root_dir, base_name = os.path.split(path)
-    base_name = base_name.replace(".npy", "")
+    base_name = (
+        base_name[:-4] if base_name.endswith(".npy") else base_name
+    )  # removing '.npy' from the filename
     image_destination = os.path.join(root_dir, "images")
     os.makedirs(image_destination, exist_ok=True)
 
@@ -143,9 +129,9 @@ def convert_binary_img_to_bgr(image: np.ndarray) -> np.ndarray:
     return bgr_image
 
 
-def process_pair_of_npy_files(
+def analyze_before_after_cracks(
     before_file: str, after_file: str
-) -> dict[str, np.ndarray]:
+) -> dict[str, str | int]:
     """
     This function processes one sample's before and after exposure video stacks, it saves the masks in the same directory as the npy file is saved. Returns a dictionary that contains the paths and the area of the cracks for the sample.
 
@@ -163,20 +149,13 @@ def process_pair_of_npy_files(
     before_exposure = np.load(before_file)
     after_exposure = np.load(after_file)
 
-    max_threshold = 95
-    min_threshold = 5
-    mask_threshold = 5
+    # Using the default values
+    before_max_image, before_min_image = get_fused_image_pairs(before_exposure)
 
-    before_max_image, before_min_image = get_fused_image_pairs(
-        before_exposure, max_threshold, min_threshold
-    )
+    after_max_image, after_min_image = get_fused_image_pairs(after_exposure)
 
-    after_max_image, after_min_image = get_fused_image_pairs(
-        after_exposure, max_threshold, min_threshold
-    )
-
-    _, before_circle_mask, _ = get_circle_mask(before_exposure, mask_threshold)
-    _, after_circle_mask, _ = get_circle_mask(after_exposure, mask_threshold)
+    _, before_circle_mask, _ = get_circle_mask(before_exposure)
+    _, after_circle_mask, _ = get_circle_mask(after_exposure)
 
     before_minmax_diff_norm = extract_binary_crack_mask(
         before_max_image,
@@ -234,14 +213,14 @@ def write_metrics_into_json_csv(
     after_path: str,
     processed_pair: dict[str, np.ndarray],
     out_path: str,
-) -> None:
+) -> dict[str, str | int]:
     """
     Writes the information about a sample into a JSON and CSV. The information that is written is the location of the registered `.npy` files, the cracks that were identified, and their area.
 
     Args:
         before_path (str): Path to the registered `.npy` stack *before* the radiation exposure
         after_path (str): Path to the registered `.npy` stack *after* the radiation exposure
-        processed_pair (dict[str, np.ndarray]): Processed pair obtained from `process_pair_of_npy_files()`
+        processed_pair (dict[str, np.ndarray]): Processed pair obtained from `analyze_before_after_cracks()`
         out_path (str): Filename of the JSON/CSV
     Returns:
         None, the two files are written into disk.
@@ -304,7 +283,8 @@ def write_metrics_into_json_csv(
 
     logger.info(f"Entry {sample_name} has been processed.")
 
-    return None
+    # TODO: Write tests for checking validity
+    return row
 
 
 def main():
@@ -317,11 +297,14 @@ def main():
     out_filename = args.output if args.output is not None else "samples_crack_area.json"
     out_filename = os.path.join(os.path.dirname(args.input), out_filename)
 
-    for before_exp, after_exp in parse_csv_pairs(args.input):
+    csv_file = pd.read_csv(args.input)
+    for before_exp, after_exp in csv_file.itertuples(index=False):
+        print(before_exp)
+        print(after_exp)
         base_dir = os.path.dirname(args.input)
         before_exp_joined = os.path.join(base_dir, before_exp)
         after_exp_joined = os.path.join(base_dir, after_exp)
-        processed_result = process_pair_of_npy_files(
+        processed_result = analyze_before_after_cracks(
             before_exp_joined, after_exp_joined
         )
 

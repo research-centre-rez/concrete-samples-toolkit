@@ -9,6 +9,8 @@ from ..image_fusion.factory_fuser import (
     PercentileFuser,
 )
 
+from ..utils.visualisers import imshow
+
 import numpy as np
 import cv2 as cv
 
@@ -18,7 +20,7 @@ percentile_fuser: PercentileFuser = ImageFuserFactory.get_fuser(FuseMethod.PERCE
 
 def keep_largest_component(mask: np.ndarray) -> np.ndarray:
     """
-    Function for returning the largest independent component of a binary mask.
+    Function for returning the largest component of a binary mask.
 
     Args:
         mask (np.ndarray): A binary mask that contains multiple regions
@@ -31,20 +33,13 @@ def keep_largest_component(mask: np.ndarray) -> np.ndarray:
     if labels_mask.max() == 0:
         return mask
 
-    # This approach is taken from: https://stackoverflow.com/a/60478387
-    # Sets the values for all the masks but the largest one to zero.
     regions = measure.regionprops(labels_mask)
     regions.sort(key=lambda x: x.area, reverse=True)
-    if len(regions) > 1:
-        for region in regions[1:]:
-            labels_mask[region.coords[:, 0], region.coords[:, 1]] = 0
 
-    # Since the largest region won't neccessarily be labeled as one, we label it to one to get
-    # a binary mask again.
-    labels_mask[labels_mask != 0] = 1
+    reduced_mask = np.zeros_like(labels_mask)
+    reduced_mask[labels_mask == regions[0].label] = 1
 
-    # return the mask in the original format
-    return (labels_mask).astype(np.uint8)
+    return reduced_mask.astype(np.uint8)
 
 
 def extract_masks(
@@ -66,15 +61,18 @@ def extract_masks(
     closed = np.copy(raw_mask)
     closed_filtered = keep_largest_component(closed)
 
+    # Sometimes there might be "pockets" of non-mask inside the mask, we remove these with adaptive
+    # closing to get a single mask that covers the whole sample.
     with tqdm(desc="Adaptive closing", unit=" iterations") as pbar:
-        while np.unique(label(closed_filtered)).size > 2:
+        # We check that there is only one background by negating the mask, any 1s inside the sample
+        # will be morphologically closed in this loop until there is only one background.
+        while np.unique(label(1 - closed_filtered)).size > 2:
+            imshow("negation", closed_filtered=(1 - closed_filtered))
             morph_size = morph_size + 1
             kernel = cv.getStructuringElement(cv.MORPH_RECT, (morph_size, morph_size))
 
             # Perform closure
-            closed_filtered = cv.morphologyEx(
-                (np.min(stack, axis=0) >= 10).astype(np.uint8), cv.MORPH_CLOSE, kernel
-            )
+            closed_filtered = cv.morphologyEx(closed_filtered, cv.MORPH_CLOSE, kernel)
             pbar.update(1)
 
     return closed_filtered, raw_mask
@@ -82,7 +80,7 @@ def extract_masks(
 
 def fit_circle(mask: np.ndarray, min_radius: int = 500):
     """
-    Function that fits a circle on a binary mask with the use of scipy's `minimize`.
+    Function that fits a circle on a binary mask with the use of scipy's `minimize`. The condition that has to be met is that mask == 1 pixels outside of the circle are minimised while mask == 0 pixels inside of the circle are minimised.
 
     Args:
         mask (np.ndarray): The binary mask that we want to fit a circle to
@@ -120,8 +118,8 @@ def fit_circle(mask: np.ndarray, min_radius: int = 500):
 
 def get_fused_image_pairs(
     video_stack: np.ndarray,
-    max_percentile_threshold: int,
-    min_percentile_threshold: int,
+    max_percentile_threshold: int = 95,
+    min_percentile_threshold: int = 5,
 ) -> tuple[np.ndarray, np.ndarray]:
     """
     Returns percentile min and max images of the input video stack. Percentile fusion is used so that the user can filter out some of the noise that might be present due to misregistration in the video stack.
@@ -148,7 +146,7 @@ def get_fused_image_pairs(
 
 
 def get_circle_mask(
-    video_stack: np.ndarray, threshold: int
+    video_stack: np.ndarray, threshold: int = 5
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Function for getting a circular mask from the video stack.
