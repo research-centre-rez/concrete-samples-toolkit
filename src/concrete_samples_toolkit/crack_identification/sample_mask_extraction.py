@@ -67,7 +67,6 @@ def extract_masks(
         # We check that there is only one background by negating the mask, any 1s inside the sample
         # will be morphologically closed in this loop until there is only one background.
         while np.unique(label(1 - closed_filtered)).size > 2:
-            imshow("negation", closed_filtered=(1 - closed_filtered))
             morph_size = morph_size + 1
             kernel = cv.getStructuringElement(cv.MORPH_RECT, (morph_size, morph_size))
 
