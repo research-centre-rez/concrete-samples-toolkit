@@ -57,7 +57,8 @@ def extract_masks(
     """
     morph_size = 1  # Init morph size
 
-    raw_mask = np.min(stack, axis=0) < threshold
+    raw_mask = percentile_fuser.get_fused_image(stack, 5) < threshold
+
     closed = np.copy(raw_mask)
     closed_filtered = keep_largest_component(closed)
 
