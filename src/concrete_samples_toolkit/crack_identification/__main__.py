@@ -10,10 +10,11 @@ import cv2 as cv
 import pandas as pd
 
 from .sample_mask_extraction import (
+    extract_masks,
     get_fused_image_pairs,
     get_circle_mask,
 )
-from .crack_mask_extraction import extract_binary_crack_mask
+from .crack_mask_extraction import extract_median_binary_mask, extract_sobel_binary_mask
 
 
 from ..utils.filename_builder import (
@@ -22,7 +23,6 @@ from ..utils.filename_builder import (
 )
 
 logger = logging.getLogger(__name__)
-
 
 def parse_args():
     argparser = argparse.ArgumentParser(
@@ -150,31 +150,38 @@ def analyze_before_after_cracks(
     after_exposure = np.load(after_file)
 
     # Using the default values
-    before_max_image, before_min_image = get_fused_image_pairs(before_exposure)
+    # before_max_image, before_min_image = get_fused_image_pairs(before_exposure)
 
-    after_max_image, after_min_image = get_fused_image_pairs(after_exposure)
+    # after_max_image, after_min_image = get_fused_image_pairs(after_exposure)
 
-    _, before_circle_mask, _ = get_circle_mask(before_exposure)
-    _, after_circle_mask, _ = get_circle_mask(after_exposure)
+    # _, before_circle_mask, _ = get_circle_mask(before_exposure)
+    # _, after_circle_mask, _ = get_circle_mask(after_exposure)
 
-    before_minmax_diff_norm = extract_binary_crack_mask(
-        before_max_image,
-        before_min_image,
-        before_circle_mask,
-        disk_size=51,
-        threshold=10,
+    config = {
+        "masking_threshold": 10,
+        "gauss_kernel": 3,
+        "sobel_kernel": 3,
+        "crack_threshold": -11,
+        "area_threshold": 60,
+    }
+
+    before_cracks = extract_sobel_binary_mask(
+        before_exposure, config
     )
 
-    after_minmax_diff_norm = extract_binary_crack_mask(
-        after_max_image, after_min_image, after_circle_mask, disk_size=51, threshold=10
+    after_cracks = extract_sobel_binary_mask(
+        after_exposure, config
     )
+
+    before_median_image, _ = get_fused_image_pairs(before_exposure, max_percentile_threshold=50)
+    after_median_image, _ = get_fused_image_pairs(after_exposure, max_percentile_threshold=50)
 
     before_max_overlaid = overlay_mask(
-        before_max_image, before_minmax_diff_norm, 0.5, [0, 255, 0]
+        before_median_image, before_cracks, 0.5, [255,0,0]
     )
 
     after_max_overlaid = overlay_mask(
-        after_max_image, after_minmax_diff_norm, 0.5, [255, 0, 0]
+        after_median_image, after_cracks
     )
 
     before_mask_out_filename, before_overlaid_mask_filename = create_out_filenames(
@@ -186,23 +193,23 @@ def analyze_before_after_cracks(
 
     cv.imwrite(
         before_mask_out_filename,
-        convert_binary_img_to_bgr(before_minmax_diff_norm),
+        convert_binary_img_to_bgr(before_cracks),
     )
     cv.imwrite(before_overlaid_mask_filename, before_max_overlaid)
 
     cv.imwrite(
-        after_mask_out_filename, convert_binary_img_to_bgr(after_minmax_diff_norm)
+        after_mask_out_filename, convert_binary_img_to_bgr(after_cracks)
     )
     cv.imwrite(after_overlaid_mask_filename, after_max_overlaid)
 
-    logger.info(f"Before exp area: {before_minmax_diff_norm.sum()}")
-    logger.info(f"After exp area: {after_minmax_diff_norm.sum()}")
+    logger.info(f"Before exp area: {before_cracks.sum()}")
+    logger.info(f"After exp area: {after_cracks.sum()}")
 
     processed_images = {
         "before_minmax_diff_norm": before_mask_out_filename,
         "after_minmax_diff_norm": after_mask_out_filename,
-        "before_area": before_minmax_diff_norm.sum(),
-        "after_area": after_minmax_diff_norm.sum(),
+        "before_area": before_cracks.sum(),
+        "after_area": after_cracks.sum(),
     }
 
     return processed_images
