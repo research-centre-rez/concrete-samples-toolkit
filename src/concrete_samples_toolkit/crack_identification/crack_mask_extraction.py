@@ -71,7 +71,7 @@ def extract_sobel_binary_mask(
     median_image[mask == 0] = 0
     median_image = crop_image(median_image, mask)
     median_image = cv.GaussianBlur(
-        median_image, (config["gauss_kernel"], config["gauss_kernel"], 0)
+        median_image, (config["gauss_kernel"], config["gauss_kernel"]), 0
     )
     sobel_x = cv.Sobel(median_image, cv.CV_64F, 1, 0, ksize=config["sobel_kernel"])
     sobel_y = cv.Sobel(median_image, cv.CV_64F, 1, 0, ksize=config["sobel_kernel"])

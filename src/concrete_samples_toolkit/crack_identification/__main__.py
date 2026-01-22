@@ -9,6 +9,8 @@ import numpy as np
 import cv2 as cv
 import pandas as pd
 
+from concrete_samples_toolkit.image_fusion import crop_image
+
 from .sample_mask_extraction import (
     extract_masks,
     get_fused_image_pairs,
@@ -100,12 +102,12 @@ def create_out_filenames(path: str) -> tuple[str, str]:
     os.makedirs(image_destination, exist_ok=True)
 
     mask_out_filename = os.path.join(image_destination, base_name)
-    mask_out_filename = create_out_filename(mask_out_filename, ["binary", "mask"], [])
+    mask_out_filename = create_out_filename(mask_out_filename, ["new", "binary", "mask"], [])
     mask_out_filename = append_file_extension(mask_out_filename, ".png")
 
     overlaid_mask_filename = os.path.join(image_destination, base_name)
     overlaid_mask_filename = create_out_filename(
-        overlaid_mask_filename, ["binary", "mask", "overlaid"], []
+        overlaid_mask_filename, ["new", "binary", "mask", "overlaid"], []
     )
     overlaid_mask_filename = append_file_extension(overlaid_mask_filename, ".png")
 
@@ -173,15 +175,24 @@ def analyze_before_after_cracks(
         after_exposure, config
     )
 
+    before_mask, _ = extract_masks(before_exposure, threshold=10)
+    after_mask, _ = extract_masks(after_exposure, threshold=10)
+
     before_median_image, _ = get_fused_image_pairs(before_exposure, max_percentile_threshold=50)
     after_median_image, _ = get_fused_image_pairs(after_exposure, max_percentile_threshold=50)
+
+    before_median_image[before_mask == 0] = 0
+    after_median_image[after_mask == 0] = 0
+
+    before_median_image = crop_image(before_median_image, before_mask)
+    after_median_image = crop_image(after_median_image, after_mask)
 
     before_max_overlaid = overlay_mask(
         before_median_image, before_cracks, 0.5, [255,0,0]
     )
 
     after_max_overlaid = overlay_mask(
-        after_median_image, after_cracks
+        after_median_image, after_cracks, 0.5, [255,0,0]
     )
 
     before_mask_out_filename, before_overlaid_mask_filename = create_out_filenames(
