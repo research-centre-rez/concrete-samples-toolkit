@@ -47,13 +47,7 @@ Structure of the pipeline is described in `src/README.md`
 git clone https://github.com/research-centre-rez/leclercq-thesis.git
 cd leclercq-thesis
 
-# Downloads the LightGlue submodule
-git submodule update --init
-python3.11 -m venv venv
-source venv/bin/activate
-
-# Installing the required dependencies
-pip install -r requirements.txt
+pip install .
 
 # Create the jupyter notebook demo
 jupytext src/demo.py --to ipynb
