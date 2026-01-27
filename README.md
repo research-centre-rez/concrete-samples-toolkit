@@ -4,6 +4,8 @@ This repository contains the codebase and supporting materials for the master's 
 
 There is a jupyter notebook available at `src/demo.ipynb` that goes through the video processing pipeline step by step. In order to be able to use it, you will need to create a Python venv, download the required packages, and download the dataset (or parts of it).
 
+Description of the repository for future developers is given in [contributions.md](/contributions.md).
+
 ## Purpose
 
 The designed pipeline enables: 
@@ -86,5 +88,3 @@ If you use this work, please cite:
     year = {2025},
 }
 ```
-
-Description of the repository for future developers is given in [contributions.md](/contributions.md).

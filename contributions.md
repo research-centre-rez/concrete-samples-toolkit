@@ -1,4 +1,4 @@
-# Developer README
+# Contributing to the project
 
 Welcome! This guide explains the internal structure and technical details of this codebase for high-resolution video registration of concrete samples.
 
@@ -6,38 +6,28 @@ Welcome! This guide explains the internal structure and technical details of thi
 
 See the [README.md](/README.md) for the basic introduction.
 
-### Pipeline stages
+The project has two main directories:
 
-1. Data pre-processing: Splits the videos into two parts and cuts out the dark scenes. 
-2. Rotation correction & video processing: Sparse optical flow for rotation correction and downsampling of the original videos. This step is fully configurable with the config file given in `src/video_processing/default_config.json5`. 
-3. Video registration: There are three available modules for the video registration. `muDIC` that performs an area-based registration. `ORB` that performs feature-based registration. And `LightGlue` that performs video registration with the use a DL-based neural network. This step is fully configurable with the config file given in `src/video_registration/default_config.json5`. 
-4. Image fusion: Creating composite images with the use of image fusion techniques. Implementation is in the `src/image_fusion/.
-5. Evaluation: Various sharpness metrics. Implementation is in `src/image_evaluation/`
+1. `src`: This is where the whole software resides, together with its modules.
+2. `tests`: Contains `PyTest` tests that are used for ensuring that adding new feature don't (completely) break the existing functionality.
 
-Each of the modules is well-documented and has a script that performs that specific step of the pipeline in `src/`. More information is available in the README given in `src/`.
+Futhermore, there are the following files:
 
-## Dependencies
+1. [`pyproject.toml`](/pyproject.toml): Used for installing the cli program with `Poetry`
+2. [`README.md`](/README.md): Simple introduction to the project and how to get it running.
+3. [`future_work.md`](/future_work.md): A short list of ideas that could be used for future work on the project.
 
-Below is a comprehensive list of the dependencies for this repository:
+# Tests
 
-- [LightGlue](https://github.com/cvg/LightGlue) 
-- [muDIC](https://mudic.readthedocs.io/en/latest/) 
-- [OpenCV](https://opencv.org/) 
-- [git LFS](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage)
-- [FFmpeg](https://ffmpeg.org/download.html) 
-- [numpy](https://numpy.org/)
+The tests that have been written cover the program's functionality so far. They don't use real data, instead we created mockups that have the same "signature" as our data.
 
-## Benchmarks
+`PyTest` is used for running these tests. If you want to only run a certain test, you can do so with the following `pytest tests/test_filename.py`. 
 
-Are presented in the original thesis. However they can be recreated by registering all of the videos in `concrete-samples` with the default config files and then evaluating them with the `image_evaluation` module. [Link to thesis in SIS.](https://is.cuni.cz/studium/dipl_st/index.php?id=&tid=&do=main&doo=detail&did=282804) 
+These tests definitely **do not** cover all possible edge-cases, nor do they cover "invalid" filetypes. As this tool is being mainly developed for only internal uses, the program expects that the data that is passed into it has the valid type and that it contains what we would expect it to contain (i.e. a concrete sample that has been radioactively exposed).
 
-## Planned improvements
+# Src
 
-- [ ] Create a `main.py` file that will go through all of the steps of the pipeline.
-- [ ] Better estimation of the registration precision.
-- [ ] Registration of the front illumination.
+The software consists of several modules that can be either be used in a pipeline manner, or independently. The modules that have been developed so far are:
 
-## Maintainers
-
-Erik Philippe Leclercq (Original author)
-Research Centre Řež - Honza Blažek (Supervisor) - Imaging and Materials Lab
+1. [`crack identification`](/src/concrete_samples_toolkit/crack_identification):
+1. [``]()
