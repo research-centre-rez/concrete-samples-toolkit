@@ -30,4 +30,5 @@ These tests definitely **do not** cover all possible edge-cases, nor do they cov
 The software consists of several modules that can be either be used in a pipeline manner, or independently. The modules that have been developed so far are:
 
 1. [`crack identification`](/src/concrete_samples_toolkit/crack_identification):
-1. [``]()
+1. [`image evaluation`](/src/concrete_samples_toolkit/image_evaluation/)
+1. [`image fusion`](/src/concrete_samples_toolkit/image_fusion/)
