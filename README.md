@@ -63,6 +63,20 @@ cd concrete-samples
 git lfs pull
 ```
 
+## Running the program
+
+The program is a cli-based tool that you can use globally, the list of available commands is:
+
+1. `cst-pre-processing`: Removes periods of darkness from the video.
+1. `cst-video-processing`: Prepares the input video for registration.
+1. `cst-video-register`: Registers a video sequence into an `.npy` file.
+1. `cst-image-fusion`: Image fusion of the registered samples.
+1. `cst-image-evaluation`: Evaluates the quality of the registration.
+1. `cst-create-before-after-pairs`: Pairs up before and after scans of the sample radiation exposure.
+1. `cst-crack-analysis`: Identifies cracks in the input samples.
+
+Each command is well documented, simply accessible with `cst-command --help`
+
 > [!WARNING]
 > The whole dataset spans around 50GB of disk space. You can download a single video from the repository's page [here.](https://huggingface.co/datasets/research-centre-rez/concrete-samples/blob/main/3A.MP4) If you choose to do so, you will need to update the video path in `src/demo.ipynb` accordingly.
 
