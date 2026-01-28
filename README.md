@@ -4,6 +4,8 @@ This repository contains the codebase and supporting materials for the master's 
 
 There is a jupyter notebook available at `src/demo.ipynb` that goes through the video processing pipeline step by step. In order to be able to use it, you will need to create a Python venv, download the required packages, and download the dataset (or parts of it).
 
+Description of the repository for future developers is given in [contributions.md](/contributions.md).
+
 ## Purpose
 
 The designed pipeline enables: 
@@ -47,13 +49,7 @@ Structure of the pipeline is described in `src/README.md`
 git clone https://github.com/research-centre-rez/leclercq-thesis.git
 cd leclercq-thesis
 
-# Downloads the LightGlue submodule
-git submodule update --init
-python3.11 -m venv venv
-source venv/bin/activate
-
-# Installing the required dependencies
-pip install -r requirements.txt
+pip install .
 
 # Create the jupyter notebook demo
 jupytext src/demo.py --to ipynb
@@ -66,6 +62,20 @@ git clone https://huggingface.co/datasets/research-centre-rez/concrete-samples
 cd concrete-samples
 git lfs pull
 ```
+
+## Running the program
+
+The program is a cli-based tool that you can use globally, the list of available commands is:
+
+1. `cst-pre-processing`: Removes periods of darkness from the video.
+1. `cst-video-processing`: Prepares the input video for registration.
+1. `cst-video-register`: Registers a video sequence into an `.npy` file.
+1. `cst-image-fusion`: Image fusion of the registered samples.
+1. `cst-image-evaluation`: Evaluates the quality of the registration.
+1. `cst-create-before-after-pairs`: Pairs up before and after scans of the sample radiation exposure.
+1. `cst-crack-analysis`: Identifies cracks in the input samples.
+
+Each command is well documented, simply accessible with `cst-command --help`
 
 > [!WARNING]
 > The whole dataset spans around 50GB of disk space. You can download a single video from the repository's page [here.](https://huggingface.co/datasets/research-centre-rez/concrete-samples/blob/main/3A.MP4) If you choose to do so, you will need to update the video path in `src/demo.ipynb` accordingly.
@@ -92,5 +102,3 @@ If you use this work, please cite:
     year = {2025},
 }
 ```
-
-Description of the repository for future developers is given in [contributions.md](/contributions.md).
